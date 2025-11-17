@@ -1,0 +1,51 @@
+services:
+  db:
+    image: mariadb:10.11
+    container_name: estoque_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db_init:/docker-entrypoint-initdb.d # executa SQL inicial
+    networks:
+      - estoque-net
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "8080:80"   # acesse http://localhost:8080
+    depends_on:
+      - db
+    networks:
+      - estoque-net
+
+  web:
+    build: .
+    container_name: estoque_web
+    restart: always
+    volumes:
+      - ./www:/var/www/html
+    ports:
+      - "8000:80"  # acesse sua app em http://localhost:8000
+    depends_on:
+      - db
+    networks:
+      - estoque-net
+
+volumes:
+  db_data:
+
+networks:
+  estoque-net:
