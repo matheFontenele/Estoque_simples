@@ -1,12 +1,14 @@
 <?php
 require_once "config.php";
 
+// Verifica se o ID foi informado
 if (!isset($_GET['id'])) {
     die("ID não informado.");
 }
 
 $id = intval($_GET['id']);
 
+// Buscar o item
 $stmt = $pdo->prepare("SELECT * FROM item WHERE id = ?");
 $stmt->execute([$id]);
 $item = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -15,6 +17,10 @@ if (!$item) {
     die("Item não encontrado.");
 }
 
+// Buscar lista de estoques para o select
+$estoques = $pdo->query("SELECT id, nome FROM estoque")->fetchAll(PDO::FETCH_ASSOC);
+
+// Atualizar item ao enviar o formulário
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $nome = $_POST['nome'];
@@ -36,7 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -51,15 +56,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <form method="POST">
 
     <label>Nome:</label>
-    <input type="text" name="nome" value="<?= $item['nome'] ?>" required>
+    <input type="text" name="nome" value="<?= htmlspecialchars($item['nome']) ?>" required>
 
     <label>Descrição:</label>
-    <input type="text" name="descricao" value="<?= $item['descricao'] ?>">
+    <input type="text" name="descricao" value="<?= htmlspecialchars($item['descricao']) ?>">
 
-    <label>ID Estoque:</label>
-    <input type="number" name="item_estoque" value="<?= $item['item_estoque'] ?>" required>
+    <label>Estoque:</label>
+    <select name="item_estoque" required>
+        <option value="">Selecione...</option>
 
-    <button type="submit" class="btn">Salvar Alterações</button>
+        <?php foreach ($estoques as $est): ?>
+            <option value="<?= $est['id'] ?>" 
+                <?= $est['id'] == $item['item_estoque'] ? 'selected' : '' ?>>
+                <?= htmlspecialchars($est['nome']) ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+
+    <br><br>
+
+    <button type="submit" class="btn">Salvar alterações</button>
     <a href="index.php" class="btn">Cancelar</a>
 
 </form>

@@ -36,6 +36,7 @@ $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <th>Descrição</th>
 	    <th>Cor</th>
             <th>Estoque</th>
+	    <td> </th>
         </tr>
     </thead>
     <tbody>
@@ -44,8 +45,11 @@ $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <td><?= $item['id'] ?></td>
                 <td><?= $item['item_nome'] ?></td>
                 <td><?= $item['descricao'] ?></td>
-		<td><?= $item['cor'] ?></th>
+		        <td><?= $item['cor'] ?></th>
                 <td><?= $item['estoque_nome'] ?: 'Sem estoque' ?></td>
+		        <td><a href="edit.php?id=<?= $item['id'] ?>">Editar</a>
+ - <a href="delete.php?id=<?= $item['id'] ?>">Excluir</a>
+</td>
             </tr>
         <?php endforeach; ?>
     </tbody>
