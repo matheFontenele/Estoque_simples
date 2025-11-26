@@ -25,15 +25,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $nome = $_POST['nome'];
     $descricao = $_POST['descricao'];
+    $quantidade = $_POST['quantidade'] === '' ? null : intval($_POST['quantidade']);
     $item_estoque = $_POST['item_estoque'];
 
     $update = $pdo->prepare("
         UPDATE item 
-        SET nome = ?, descricao = ?, item_estoque = ?
+        SET nome = ?, descricao = ?, quantidade = ?, item_estoque = ?
         WHERE id = ?
     ");
 
-    if ($update->execute([$nome, $descricao, $item_estoque, $id])) {
+    if ($update->execute([$nome, $descricao, $quantidade, $item_estoque, $id])) {
         header("Location: index.php");
         exit;
     } else {
@@ -60,6 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <label>Descrição:</label>
     <input type="text" name="descricao" value="<?= htmlspecialchars($item['descricao']) ?>">
+
+    <label>Quantidade:</label>
+    <input type="number" name="quantidade" value="<?= htmlspecialchars($item['quantidade']) ?>">
 
     <label>Estoque:</label>
     <select name="item_estoque" required>

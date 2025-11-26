@@ -7,11 +7,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = $_POST['nome'] ?? '';
     $descricao = $_POST['descricao'] ?? '';
     $cor = $_POST['cor'] ?? 'não se aplica';
+    $quantidade = $_POST['quantidade'] === '' ? null: $_POST['quantidade'];
     $item_estoque = $_POST['estoque_id'] ?: null;
 
     // Inserir item
-    $sql = "INSERT INTO item (nome, descricao, cor, item_estoque)
-            VALUES (:nome, :descricao, :cor, :item_estoque)";
+    $sql = "INSERT INTO item (nome, descricao, cor, quantidade, item_estoque)
+            VALUES (:nome, :descricao, :cor, :quantidade, :item_estoque)";
 
     $stmt = $pdo->prepare($sql);
 
@@ -19,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':nome' => $nome,
         ':descricao' => $descricao,
         ':cor' => $cor,
+	':quantidade' => $quantidade,
         ':item_estoque' => $item_estoque
     ]);
 
@@ -47,6 +49,10 @@ $estoques = $pdo->query("SELECT id, nome FROM estoque ORDER BY nome")->fetchAll(
 
     <label>Descrição:
         <input name="descricao">
+    </label><br><br>
+
+    <label>Quantidade:
+	<input name ="quantidade">
     </label><br><br>
 
     <!-- CAMPO COR ENUM -->
@@ -82,3 +88,4 @@ $estoques = $pdo->query("SELECT id, nome FROM estoque ORDER BY nome")->fetchAll(
 
 </body>
 </html>
+♠

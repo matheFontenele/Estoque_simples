@@ -8,6 +8,7 @@ $query = "
         item.nome AS item_nome,
         item.descricao,
 	item.cor,
+	item.quantidade,
         estoque.nome AS estoque_nome
     FROM item
     LEFT JOIN estoque ON item.item_estoque = estoque.id
@@ -35,6 +36,7 @@ $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <th>Item</th>
             <th>Descrição</th>
 	    <th>Cor</th>
+	    <th>Quantidade</th>
             <th>Estoque</th>
 	    <td> </th>
         </tr>
@@ -45,7 +47,8 @@ $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <td><?= $item['id'] ?></td>
                 <td><?= $item['item_nome'] ?></td>
                 <td><?= $item['descricao'] ?></td>
-		        <td><?= $item['cor'] ?></th>
+		<td><?= $item['cor'] ?></th>
+		<td><?= $item['quantidade'] ?></th>
                 <td><?= $item['estoque_nome'] ?: 'Sem estoque' ?></td>
 		        <td><a href="edit.php?id=<?= $item['id'] ?>">Editar</a>
  - <a href="delete.php?id=<?= $item['id'] ?>">Excluir</a>
