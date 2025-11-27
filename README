@@ -1,0 +1,189 @@
+
+# 📦 Sistema de Estoque – ALUCOM
+
+Sistema simples de CRUD em PHP + MySQL rodando totalmente em Docker, ideal para estudo e utilização em pequenos sistemas internos.
+
+
+## 📁 Estrutura do Projeto
+```
+ESTOQUE_ALUCOM/
+│
+├── db_init/
+│   └── create_tables.sql        # Script de criação das tabelas
+│
+├── www/                         # Código PHP do sistema
+│   ├── add.php
+│   ├── config.php
+│   ├── delete.php
+│   ├── edit.php
+│   ├── estoque_add.php
+│   ├── estoque_delete.php
+│   ├── estoque_edit.php
+│   ├── estoque_index.php
+│   ├── index.php
+│   └── view.php
+│
+├── .env                         # Variáveis de ambiente do banco
+├── docker-compose.yml           # Stack completa PHP + MySQL + phpMyAdmin
+├── Dockerfile                   # Configuração da imagem PHP 8.1 com Apache
+└── README.md                    # (gerado agora)
+```
+
+
+## 🚀 Tecnologias Utilizadas
+
+- PHP 8.1 (Apache)
+- MySQL 8
+- phpMyAdmin
+- Docker + Docker Compose
+- PDO para conexão ao banco
+
+
+## ⚙️ Como Rodar o Projeto
+### 1️⃣ Crie o arquivo .env na raiz (se ainda não existir)
+```bash
+MYSQL_HOST=db
+MYSQL_USER=root
+MYSQL_PASSWORD=root
+MYSQL_DATABASE=alucom_db
+```
+### 2️⃣ Suba os containers
+```bash
+docker-compose up -d --build
+```
+## Serviços disponíveis:
+
+| Serviço      | URL |
+|--------------|-----|
+| Sistema PHP  | [http://localhost:8080](http://localhost:8080) |
+| phpMyAdmin   | [http://localhost:9000](http://localhost:9000) |
+| MySQL        | porta **3306** (interno ao Docker) |
+
+## 🗄️ Banco de Dados
+
+O container MySQL automaticamente executa o arquivo:
+
+```bash
+db_init/create_tables.sql
+```
+
+Script incluído:
+
+#### Tabela `estoque`
+
+```bash
+CREATE TABLE IF NOT EXISTS estoque (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    endereco VARCHAR(255) NOT NULL,
+    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+```
+
+#### Tabela `item`
+
+```bash
+CREATE TABLE IF NOT EXISTS item (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(255),
+    cor ENUM('preto', 'ciano', 'magenta', 'amarelo', 'não se aplica') 
+        NOT NULL DEFAULT 'não se aplica',
+    item_estoque INT,
+    CONSTRAINT fk_item_estoque
+        FOREIGN KEY (item_estoque) REFERENCES estoque(id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+```
+
+## 🖥️ Funcionalidades do Sistema
+
+✔️ Cadastro de estoque
+
+✔️ Listagem de estoques
+
+✔️ Edição de estoque
+
+✔️ Remoção de estoque
+
+✔️ Cadastro de itens
+
+✔️ Relacionamento item → estoque
+
+✔️ Usu interface simples em HTML + PHP
+
+✔️ Acesso via navegador
+
+## 🧱 Arquivos Principais PHP
+
+| Arquivo      | Função |
+|--------------|-----|
+| `index.php`  | Home do sistema |
+| `estoque_index.php`  | Lista todos os estoques |
+| `estoque_add.php.`  | Formulário para adicionar estoque |
+| `estoque_edit.php`  | Edição de estoque |
+| `estoque_delete.php`  | Exclusão de estoque |
+| `add.php`  | Adicionar item |
+| `edit.php`  | Editar item |
+| `delete.php`  | Deletar item |
+| `view.php`  | Visualizar itens |
+| `config.php`  | Conexão PDO com MySQL |
+
+## 🐳 Arquivos Docker
+#### Dockerfile
+```
+FROM php:8.1-apache
+
+RUN docker-php-ext-install pdo pdo_mysql
+RUN a2enmod rewrite
+
+COPY ./www /var/www/html
+```
+
+#### docker-compose.yml
+```
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./www:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: alucom_db
+    volumes:
+      - ./db_init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "9000:80"
+```
+## 🔧 Como Fazer Alterações no Código
+O volume no Docker já sincroniza a pasta:
+```
+./www → /var/www/html
+```
+Então, qualquer alteração no código reflete na hora, sem rebuild.
+## 🧹 Encerrar containers
+```
+docker-compose down
+```
+## Autores
+
+- [@mathFontenele](https://github.com/matheFontenele)
+
